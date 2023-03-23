@@ -4,8 +4,18 @@ const app = express();
 
 app.use(express.json());
 
-// app.get()
-// app.post()
+/*
+app.get(){
+  // look up
+  // Not existing, return Error
+};
+*/
+
+/*
+ app.post()
+
+ */
+
 // app.put()
 // app.delete()
 
@@ -41,18 +51,32 @@ const users = [
   { id: 3, user_name: "sanjid" },
   { id: 4, user_name: "shakil" },
 ];
-app.get("/api", (req, res) => {
-  res.send(users);
+app.get("/api/get/users/", (req, res) => {
+  res.send(users); //return the all users
 });
-app.get("/api/users/:id", (req, res) => {
-  const user = users.find((c) => c.id === parseInt(req.params.id));
-  if (!user) res.status(404).send("The user with the given id was not Found");
-  res.send(user);
+app.get("/api/get/users/:id", (req, res) => {
+  const user = users.find((c) => c.id === parseInt(req.params.id)); // look up the user
+  if (!user) res.status(404).send("The user with the given id was not Found"); // Not existing, return error
+  res.send(user); //return the same user
 });
 
 /* POST request handling */
+app.post("/api/post/users", (req, res) => {
+  if (!req.body.name || req.body.name.length < 3) {
+    res.status(400).send("Name is required and should be minimum charecter 3.");
+    return;
+  }
 
-app.post("/api/users", (req, res) => {
+  const user = {
+    id: users.length + 1,
+    name: req.body.name,
+  };
+  users.push(user);
+  res.send(user); //return the same user
+});
+
+/* POST request handling with inputr validation */
+app.post("/api/post/validation/users", (req, res) => {
   //input validation
   const schema = {
     name: Joi.string().min(3).required(),
@@ -70,6 +94,19 @@ app.post("/api/users", (req, res) => {
     name: req.body.name,
   };
   users.push(user);
+  res.send(user); //return the same user
+});
+
+/* Delete request handling */
+app.delete("/api/delete/users/:id", (req, res) => {
+  const user = users.find((c) => c.id === parseInt(req.params.id)); // look up the user
+  if (!user) res.status(404).send("The user with the given id was not Found"); // Not existing, return error
+
+  //delete
+  const index = users.indexOf(user);
+  users.splice(index, 1);
+
+  //return the same user
   res.send(user);
 });
 
